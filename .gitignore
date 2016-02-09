@@ -1,0 +1,8 @@
+# Created by Matt, Brett, Sydney, Ryan
+# Spring 2016
+# git ignore file used to help with project implementations.
+
+build/**
+debug/**
+dist/**
+nbproject/**
