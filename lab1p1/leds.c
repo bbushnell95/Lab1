@@ -6,6 +6,7 @@
 */
 
 #include <xc.h>
+#include "leds.h"
 
 #define LEDRUN LATGbits.LATG12  
 #define LEDSTOP LATGbits.LATG14

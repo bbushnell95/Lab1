@@ -13,7 +13,6 @@
 #include "interrupt.h"
 #include "switch.h"
 #include "timer.h"
-#include "config.h"
 
 #define LEDRUN LATGbits.LATG12  
 #define LEDSTOP LATGbits.LATG14
@@ -51,8 +50,8 @@ int main(void)
                     PrevState=1;
                     if(switchFlag==1)              //if switch is pressed
                   {
-                    switchFlag=0;
-                    state=debouncePress;
+                        switchFlag=0;
+                      state=debouncePress;
                   }
                     break;
                case ledstop:                       //LED 2 is on
@@ -76,12 +75,16 @@ int main(void)
                   break;
    
                 case wait:                      //waits until switch is released
-                    if (EXTERNAL != PRESSED)
+                    if(switchFlag==0)
                     {
-                        state = debounceRelease;
+                        state=wait;
+                    }
+                    else
+                    {
+                        switchFlag=0;
+                        state=debounceRelease;
                     }
                     break;
-                    
                 case wait2:                     //uses flag that is triggerd if switch is held for longer than
                    if(PrevState==1)
                    {
@@ -99,9 +102,9 @@ int main(void)
     return 0;
 }
 
-void __ISR(_CHANGE_NOTICE_VECTOR, IPL7SRS) _CNInterrupt(void){
+void __ISR(_CHANGE_NOTICE_VECTOR, IPL3SRS) _CNInterrupt(void){
     //TODO: Implement the interrupt to capture the press of the button
-    PORTG;
+    PORTA;
     IFS1bits.CNAIF=0;
     switchFlag=1;
 }

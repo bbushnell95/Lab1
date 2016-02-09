@@ -6,6 +6,7 @@
  */
 
 #include <xc.h>
+#include "timer.h"
 
 #define PRESCALAR_256 3
 
