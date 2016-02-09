@@ -2,7 +2,12 @@
 # Spring 2016
 # git ignore file used to help with project implementations.
 
-build/**
-debug/**
-dist/**
-nbproject/**
+# Ignores all of these files"
+#BUILD
+	build/**
+#DEBUG
+	debug/**
+#DIST	
+	dist/**
+#NBPROJECT	
+	nbproject/**
