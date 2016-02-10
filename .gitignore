@@ -4,10 +4,12 @@
 
 # Ignores all of these files"
 #BUILD
-	build/**
+	/lab1p1/build/**
 #DEBUG
-	debug/**
+	/lab1p1/debug/**
 #DIST	
 	dist/**
 #NBPROJECT	
-	nbproject/**
+	/lab1p1/nbproject/**
+#MAKEFILE
+	/lab1p1/Makefile
