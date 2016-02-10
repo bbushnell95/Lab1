@@ -4,15 +4,15 @@
 
 # Ignores all of these files
 #BUILD
-build/**
+**/build/**
 #DEBUG
-debug/**
+**/debug/**
 #DIST	
-dist/**
+**/dist/**
 #NBPROJECT
-nbproject/**/*.xml
-nbproject/**/*.mk
-nbproject/**/*.properties
-nbproject/**/*.bash
+**/nbproject/**/*.xml
+**/nbproject/**/*.mk
+**/nbproject/**/*.properties
+**/nbproject/**/*.bash
 #MAKEFILE
 Makefile
