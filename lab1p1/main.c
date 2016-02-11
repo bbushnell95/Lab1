@@ -8,12 +8,12 @@
 // ******************************************************************************************* //
 
 #include <xc.h>
+#include "config.h"
 #include <sys/attribs.h>
 #include "leds.h"
 #include "interrupt.h"
 #include "switch.h"
 #include "timer.h"
-#include "config.h"
 
 #define LEDRUN LATGbits.LATG12  
 #define LEDSTOP LATGbits.LATG14
@@ -35,12 +35,12 @@ int main(void)
 {
     SYSTEMConfigPerformance(10000000);
     enableInterrupts();
-    initTimer1();
+    //initTimer1();
     initLEDs();
     initSW2();
     
     
-    int PrevState=0; 
+    int PrevState=1; 
     int state=ledrun;
     while(1)
     {
@@ -51,8 +51,8 @@ int main(void)
                     PrevState=1;
                     if(switchFlag==1)              //if switch is pressed
                   {
-                    switchFlag=0;
-                    state=debouncePress;
+                      switchFlag=0;
+                      state=debouncePress;
                   }
                     break;
                case ledstop:                       //LED 2 is on
@@ -66,22 +66,26 @@ int main(void)
                   }
                     break;    
               case debouncePress:               //calls delay and moves to wait state
-                  delayMs(5);
+                  delayMs(50);
                   state=wait;
                   break;
     
               case debounceRelease:             //calls delay and moves to wait 2 aka logic state
-                  delayMs(5);
+                  delayMs(50);
                   state=wait2;
                   break;
    
                 case wait:                      //waits until switch is released
-                    if (EXTERNAL != PRESSED)
+                    if(switchFlag==0)
                     {
-                        state = debounceRelease;
+                        state=wait;
+                    }
+                    else
+                    {
+                        switchFlag=0;
+                        state=debounceRelease;
                     }
                     break;
-                    
                 case wait2:                     //uses flag that is triggerd if switch is held for longer than
                    if(PrevState==1)
                    {
@@ -101,7 +105,7 @@ int main(void)
 
 void __ISR(_CHANGE_NOTICE_VECTOR, IPL7SRS) _CNInterrupt(void){
     //TODO: Implement the interrupt to capture the press of the button
-    PORTG;
+    PORTA;
     IFS1bits.CNAIF=0;
     switchFlag=1;
 }

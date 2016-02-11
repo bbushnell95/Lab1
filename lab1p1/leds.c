@@ -6,7 +6,6 @@
 */
 
 #include <xc.h>
-#include "leds.h"
 
 #define LEDRUN LATGbits.LATG12  
 #define LEDSTOP LATGbits.LATG14
@@ -20,7 +19,10 @@ void initLEDs(){
     TRISGbits.TRISG12=OUTPUT;
     TRISGbits.TRISG14=OUTPUT;
     
+    LATGbits.LATG12=1;
+    LATGbits.LATG14=1;
+    
     LEDRUN=ON;
-    LEDSTOP=OFF;
+    LEDSTOP=ON;
     
 }
