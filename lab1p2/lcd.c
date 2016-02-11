@@ -23,17 +23,21 @@
  * help you debug your implementation!
  */
 
-#define LCD_DATA  0b0000
-#define LCD_RS  0
-#define LCD_E   0
-#define LCD_RW  0
-
 #define TRIS_D7 TRISEbits.TRISE1
 #define TRIS_D6 TRISEbits.TRISE3
 #define TRIS_D5 TRISEbits.TRISE5
 #define TRIS_D4 TRISEbits.TRISE7
 #define TRIS_RS TRISCbits.TRISC4
 #define TRIS_E  TRISCbits.TRISC2
+
+
+#define LCD_D7_3  LATEbits.LATE1
+#define LCD_D6_2  LATEbits.LATE3
+#define LCD_D5_1  LATEbits.LATE5
+#define LCD_D4_0  LATEbits.LATE7
+#define LCD_RS  LATCbits.LATC4
+#define LCD_E   LATCbits.LATC2
+#define LCD_RW  LATCbits.LATC12
 
 /* This function should take in a two-byte word and writes either the lower or upper
  * byte to the last four bits of LATE. Additionally, according to the LCD data sheet
@@ -45,29 +49,31 @@
 void writeFourBits(unsigned char word, unsigned int commandType, unsigned int delayAfter, unsigned int lower){
     //TODO:
     // set the commandType (RS value)
-    TRIS_RS=commandType;
+    LCD_RS=commandType;
+    LCD_RW=0;
     
     if (lower==1)
     {
-    LATEbits.LATE0 = word&0x01;
-    LATEbits.LATE2 = word&0x02;
-    LATEbits.LATE4 = word&0x04;
-    LATEbits.LATE6 = word&0x08;
+    LCD_D4_0 = word&0x01;
+    LCD_D5_1 = (word&0x02)>>1;
+    LCD_D6_2 = (word&0x04)>>2;
+    LCD_D7_3 = (word&0x08)>>3;
     }
     else if (lower==0)
     {
-    LATEbits.LATE0 = word&0x10;     //16
-    LATEbits.LATE2 = word&0x20;     //32
-    LATEbits.LATE4 = word&0x40;     //64
-    LATEbits.LATE6 = word&0x80;     //128
+    LCD_D4_0 = (word&0x10)>>4;     //16
+    LCD_D5_1 = (word&0x20)>>5;     //32
+    LCD_D6_2 = (word&0x40)>>6;     //64
+    LCD_D7_3 = (word&0x80)>>7;     //128
     }
-    
     //enable
     LCD_E=1;
     //delay
     delayUs(delayAfter);          
     //disable
     LCD_E=0;
+    
+    //delayUs(50);
 }
 
 /* Using writeFourBits, this function should write the two bytes of a character
@@ -75,15 +81,15 @@ void writeFourBits(unsigned char word, unsigned int commandType, unsigned int de
  */
 void writeLCD(unsigned char word, unsigned int commandType, unsigned int delayAfter){
     //TODO:
-    writeFourBits(word,commandType,delayAfter,1);
     writeFourBits(word,commandType,delayAfter,0);
+    writeFourBits(word,commandType,delayAfter,1);
 }
 
 /* Given a character, write it to the LCD. RS should be set to the appropriate value.
  */
 void printCharLCD(char c) {
     //TODO:
-    writeLCD(c,1,100);      //check this
+    writeLCD(c,1,100);      
     
 }
 /*Initialize the LCD
@@ -105,69 +111,36 @@ void initLCD(void) {
     
     // Enable 4-bit interface
     delayUs(15000);     //delay 15ms
+
+    writeFourBits(0b00110000, 0, 4100, 0);
     
-    LCD_RS=0;
-    LCD_RW=0;
-    LCD_DATA=0b0011;
+
+    writeFourBits(0b00110000, 0, 100, 0);
+   
+    writeFourBits(0b00110000, 0, 0, 0);
     
-    delayUs(4100);
-    
-    LCD_RS=0;
-    LCD_RW=0;
-    LCD_DATA=0b0011;
-    
-    delayUs(100);
-    
-    LCD_RS=0;
-    LCD_RW=0;
-    LCD_DATA=0b0011;
-    
-    LCD_RS=0;
-    LCD_RW=0;
-    LCD_DATA=0b0010;
-    
-    
+    writeFourBits(0b00100000, 0, 0, 0);
     // Function Set (specifies data width, lines, and font.
 
-    LCD_RS=0;
-    LCD_RW=0;
-    LCD_DATA=0b0011;
-    
-    LCD_RS=0;
-    LCD_RW=0;
-    LCD_DATA=0b1011;
+    writeFourBits(0b00101011, 0, 0,0);
+    writeFourBits(0b00101011, 0, 0,1);
     // 4-bit mode initialization is complete. We can now configure the various LCD
     // options to control how the LCD will function.
 
     // TODO: Display On/Off Control
         // Turn Display (D) Off
-    
-    LCD_RS=0;
-    LCD_RW=0;
-    LCD_DATA=0b0000;
-    
-    LCD_RS=0;
-    LCD_RW=0;
-    LCD_DATA=0b1000;
+
+    writeFourBits(0b00001000, 0, 0,0);
+    writeFourBits(0b00001000, 0, 0,1);
     // TODO: Clear Display (The delay is not specified in the data sheet at this point. You really need to have the clear display delay here.
-    
-    LCD_RS=0;
-    LCD_RW=0;
-    LCD_DATA=0b0000;
-    
-    LCD_RS=0;
-    LCD_RW=0;
-    LCD_DATA=0b0001;
+
+     writeFourBits(0b00000001, 0, 0,0);
+     writeFourBits(0b00000001, 0, 0,1);
     // TODO: Entry Mode Set
         // Set Increment Display, No Shift (i.e. cursor move)
-    
-    LCD_RS=0;
-    LCD_RW=0;
-    LCD_DATA=0b0000;
-    
-    LCD_RS=0;
-    LCD_RW=0;
-    LCD_DATA=0b0111;
+
+    writeFourBits(0b00000111, 0, 0,0);
+    writeFourBits(0b00000111, 0, 0,1);
     // TODO: Display On/Off Control
         // Turn Display (D) On, Cursor (C) Off, and Blink(B) Off
 }
@@ -179,7 +152,11 @@ void initLCD(void) {
  */
 void printStringLCD(const char* s) {
     //TODO:
-    printCharLCD();     //need to write this function
+    while(&s!=void)
+    {
+    printCharLCD(&s);   //need to write this function
+    s=s+1;
+    }
 }
 
 /*
@@ -187,9 +164,8 @@ void printStringLCD(const char* s) {
  */
 void clearLCD()
 {
-    LCD_RS=0;
-    LCD_RW=0;
-    LCD_DATA=0b00000001;
+    writeFourBits(0b00000001,0, 100, 0);
+    writeFourBits(0b00000001,0, 100, 1);
 }
 
 /*
@@ -197,31 +173,33 @@ void clearLCD()
  */
 void moveCursorLCD(unsigned char x, unsigned char y)
 {
-    LCD_RS=0;
-    LCD_RW=0;
-    
+    char c="";
+
     if(y==1)
     {
-        if(x==1) LCD_DATA=10000000;
-        else if(x==2)LCD_DATA=10000001;
-        else if(x==3)LCD_DATA=10000010;
-        else if(x==4)LCD_DATA=10000011;
-        else if(x==5)LCD_DATA=10000100;
-        else if(x==6)LCD_DATA=10000101;
-        else if(x==7)LCD_DATA=10000110;
-        else if(x==8)LCD_DATA=10000111;
+        if(x==1) c=0b10000000;
+        else if(x==2)c=0b10000001;
+        else if(x==3)c=0b10000010;
+        else if(x==4)c=0b10000011;
+        else if(x==5)c=0b10000100;
+        else if(x==6)c=0b10000101;
+        else if(x==7)c=0b10000110;
+        else if(x==8)c=0b10000111;
     }
     else if(y==2)
     {
-        if(x==1) LCD_DATA=10001000;
-        else if(x==2)LCD_DATA=10001001;
-        else if(x==3)LCD_DATA=10001010;
-        else if(x==4)LCD_DATA=10001011;
-        else if(x==5)LCD_DATA=10001100;
-        else if(x==6)LCD_DATA=10001101;
-        else if(x==7)LCD_DATA=10001110;
-        else if(x==8)LCD_DATA=10001111;
+        if(x==1) c=0b10001000;
+        else if(x==2)c=0b10001001;
+        else if(x==3)c=0b10001010;
+        else if(x==4)c=0b10001011;
+        else if(x==5)c=0b10001100;
+        else if(x==6)c=0b10001101;
+        else if(x==7)c=0b10001110;
+        else if(x==8)c=0b10001111;
     }
+    
+    writeFourBits(c, 1, 0,0);
+    writeFourBits(c, 1, 0,1);
 }
 
 /*
