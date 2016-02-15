@@ -105,7 +105,7 @@ void initLCD(void) {
     TRIS_E  =0;
 
     // Initilization sequence utilizes specific LCD commands before the general configuration
-    // commands can be utilized. The first few initilition commands cannot be done using the
+    // commands can be utilized. The first few initialization commands cannot be done using the
     // WriteLCD function. Additionally, the specific sequence and timing is very important.
 
     
@@ -173,7 +173,7 @@ void clearLCD()
  */
 void moveCursorLCD(unsigned char x, unsigned char y)
 {
-    char c="";
+char c="";
 
     if(y==1)
     {
@@ -219,3 +219,4 @@ void testLCD(){
     printStringLCD("Hello!");
     for(i = 0; i < 1000; i++) delayUs(1000);
 }
+
