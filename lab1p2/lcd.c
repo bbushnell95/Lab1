@@ -154,7 +154,7 @@ void printStringLCD(const char* s) {
     //TODO:
     while(&s!=NULL)
     {
-    printCharLCD(&s);   //need to write this function
+    printCharLCD(*s);   //need to write this function
     s=s+1;
     }
 }
@@ -178,40 +178,40 @@ void moveCursorLCD(unsigned char x, unsigned char y)
     if(y==1)
     {
         if(x==1) c=0b00000000;
-        else if(x==2)c=0b00000001;
-        else if(x==3)c=0b00000010;
-        else if(x==4)c=0b00000011;
-        else if(x==5)c=0b00000100;
-        else if(x==6)c=0b00000101;
-        else if(x==7)c=0b00000110;
-        else if(x==8)c=0b00000111;
-        else if(x==9)c=0b00001000;
-        else if(x==10)c=0b00001001;
-        else if(x==11)c=0b00001010;
-        else if(x==12)c=0b00001011;
-        else if(x==13)c=0b00001100;
-        else if(x==14)c=0b00001101;
-        else if(x==15)c=0b00001110;
-        else if(x==16)c=0b00001111;        
+        else if(x==2)c=0b10000001;
+        else if(x==3)c=0b10000010;
+        else if(x==4)c=0b10000011;
+        else if(x==5)c=0b10000100;
+        else if(x==6)c=0b10000101;
+        else if(x==7)c=0b10000110;
+        else if(x==8)c=0b10000111;
+        else if(x==9)c=0b10001000;
+        else if(x==10)c=0b10001001;
+        else if(x==11)c=0b10001010;
+        else if(x==12)c=0b10001011;
+        else if(x==13)c=0b10001100;
+        else if(x==14)c=0b10001101;
+        else if(x==15)c=0b10001110;
+        else if(x==16)c=0b10001111;        
     }
     else if(y==2)
     {
-        if(x==1) c=0b01000000;
-        else if(x==2)c=0b01000001;
-        else if(x==3)c=0b01000010;
-        else if(x==4)c=0b01000011;
-        else if(x==5)c=0b01000100;
-        else if(x==6)c=0b01000101;
-        else if(x==7)c=0b01000110;
-        else if(x==8)c=0b01000111;
-        else if(x==9)c=0b01001000;
-        else if(x==10)c=0b01001001;
-        else if(x==11)c=0b01001010;
-        else if(x==12)c=0b01001011;
-        else if(x==13)c=0b01001100;
-        else if(x==14)c=0b01001101;
-        else if(x==15)c=0b01001110;
-        else if(x==16)c=0b01001111;
+        if(x==1) c=0b11000000;
+        else if(x==2)c=0b11000001;
+        else if(x==3)c=0b11000010;
+        else if(x==4)c=0b11000011;
+        else if(x==5)c=0b11000100;
+        else if(x==6)c=0b11000101;
+        else if(x==7)c=0b11000110;
+        else if(x==8)c=0b11000111;
+        else if(x==9)c=0b11001000;
+        else if(x==10)c=0b11001001;
+        else if(x==11)c=0b11001010;
+        else if(x==12)c=0b11001011;
+        else if(x==13)c=0b11001100;
+        else if(x==14)c=0b11001101;
+        else if(x==15)c=0b11001110;
+        else if(x==16)c=0b11001111;
     }
     
     writeFourBits(c, 1, 0,0);
