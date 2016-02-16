@@ -154,7 +154,7 @@ void printStringLCD(const char* s) {
     //TODO:
     while(&s!=NULL)
     {
-    printCharLCD(&s);   //need to write this function
+    printCharLCD(*s);   //need to write this function
     s=s+1;
     }
 }
