@@ -37,7 +37,7 @@
 #define LCD_D4_0  LATEbits.LATE7
 #define LCD_RS  LATCbits.LATC4
 #define LCD_E   LATCbits.LATC2
-#define LCD_RW  LATCbits.LATC12
+
 
 /* This function should take in a two-byte word and writes either the lower or upper
  * byte to the last four bits of LATE. Additionally, according to the LCD data sheet
@@ -50,8 +50,8 @@ void writeFourBits(unsigned char word, unsigned int commandType, unsigned int de
     //TODO:
     // set the commandType (RS value)
     LCD_RS=commandType;
-    LCD_RW=0;
     
+    //LATEbits.LATE1 = 1;
     if (lower==1)
     {
     LCD_D4_0 = word&0x01;
@@ -69,11 +69,12 @@ void writeFourBits(unsigned char word, unsigned int commandType, unsigned int de
     //enable
     LCD_E=1;
     //delay
-    delayUs(delayAfter);          
+    delayUs(1);          
     //disable
     LCD_E=0;
-    
+    delayUs(delayAfter);
     //delayUs(50);
+     
 }
 
 /* Using writeFourBits, this function should write the two bytes of a character
@@ -110,20 +111,19 @@ void initLCD(void) {
 
     
     // Enable 4-bit interface
-    delayUs(15000);     //delay 15ms
+    delayMs(25);     //delay 15ms
 
-    writeFourBits(0b00110000, 0, 4100, 0);
+    writeFourBits(0b00110000, 0, 4500, 0);
     
 
-    writeFourBits(0b00110000, 0, 100, 0);
+    writeFourBits(0b00110000, 0, 200, 0);
    
-    writeFourBits(0b00110000, 0, 0, 0);
-    
-    writeFourBits(0b00100000, 0, 0, 0);
+    writeFourBits(0b00110000, 0, 0, 0); 
+    writeFourBits(0b00100000, 0, 40, 0);
     // Function Set (specifies data width, lines, and font.
 
     writeFourBits(0b00101011, 0, 0,0);
-    writeFourBits(0b00101011, 0, 0,1);
+    writeFourBits(0b00101011, 0, 40,1);
     // 4-bit mode initialization is complete. We can now configure the various LCD
     // options to control how the LCD will function.
 
@@ -131,16 +131,16 @@ void initLCD(void) {
         // Turn Display (D) Off
 
     writeFourBits(0b00001000, 0, 0,0);
-    writeFourBits(0b00001000, 0, 0,1);
+    writeFourBits(0b00001000, 0, 40,1);
     // TODO: Clear Display (The delay is not specified in the data sheet at this point. You really need to have the clear display delay here.
 
      writeFourBits(0b00000001, 0, 0,0);
-     writeFourBits(0b00000001, 0, 0,1);
+     writeFourBits(0b00000001, 0, 1640,1);
     // TODO: Entry Mode Set
         // Set Increment Display, No Shift (i.e. cursor move)
 
-    writeFourBits(0b00000111, 0, 0,0);
-    writeFourBits(0b00000111, 0, 0,1);
+    writeFourBits(0b00000110, 0, 0,0);
+    writeFourBits(0b00000110, 0, 40,1);
     // TODO: Display On/Off Control
         // Turn Display (D) On, Cursor (C) Off, and Blink(B) Off
 }
