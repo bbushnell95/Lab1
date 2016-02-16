@@ -38,7 +38,7 @@ void delayUs(unsigned int delay){
     T2CONbits.TCKPS=0;      //prescale of 1
     PR2=((delay*10)-1);
     T2CONbits.ON=1;
-    IFS0bits.T2IF=0;
+    IFS0bits.T2IF=1;
     while(IFS0bits.T2IF==0)
     {
         

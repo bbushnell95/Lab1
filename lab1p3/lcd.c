@@ -215,7 +215,7 @@ void moveCursorLCD(unsigned char x, unsigned char y)
     }
     
     writeFourBits(c, 1, 0,0);
-    writeFourBits(c, 1, 40,1);
+    writeFourBits(c, 1, 0,1);
 }
 
 /*
