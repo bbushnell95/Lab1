@@ -177,7 +177,7 @@ void moveCursorLCD(unsigned char x, unsigned char y)
 
     if(y==1)
     {
-        if(x==1) c=0b00000000;
+        if(x==1) c=0b10000000;
         else if(x==2)c=0b10000001;
         else if(x==3)c=0b10000010;
         else if(x==4)c=0b10000011;

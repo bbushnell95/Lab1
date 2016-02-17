@@ -12,48 +12,48 @@
 #include "config.h"
 #include "timer.h"
 #include "interrupt.h"
-#include "led.h" 
 #include "lcd.h"
 
 
 // ******************************************************************************************* //
-void testDelayUs();
-void testWriteLCD();
+//void testDelayUs();
+//void testWriteLCD();
 
 int main(void)
 {
     SYSTEMConfigPerformance(10000000);
-    
-    initLCD();
+    enableInterrupts();
     initTimer1();
     initTimer2();
-    initLEDs();
+    //initLEDs();
+    initLCD();
+    
 
     while(1)
     {
-        testWriteLCD();
+        testLCD();
         
     }
     
     return 0;
 }
 
-void testDelayUs(){
-    
-    while(1){
-        delayUs(50);
-        LATDbits.LATD0 = 1;
-        delayUs(50);
-        LATDbits.LATD0 = 0;
-    }
-}
+//void testDelayUs(){
+//    
+//    while(1){
+//        delayUs(50);
+//        LATDbits.LATD0 = 1;
+//        delayUs(50);
+//        LATDbits.LATD0 = 0;
+//    }
+//}
+////
+//void testWriteLCD(){
 //
-void testWriteLCD(){
-
-    while(1){
-        delayUs(500);
-        writeLCD('c',1,100);
-        delayUs(500);
-        clearLCD();
-    }
-}
+//    while(1){
+//        delayUs(500);
+//        writeLCD('c',1,100);
+//        delayUs(500);
+//        clearLCD();
+//    }
+//}
