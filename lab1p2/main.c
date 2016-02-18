@@ -31,7 +31,7 @@ int main(void)
 
     while(1)
     {
-        testLCD();
+        testWriteLCD();
         
     }
     
@@ -48,12 +48,12 @@ int main(void)
 //    }
 //}
 ////
-//void testWriteLCD(){
-//
-//    while(1){
-//        delayUs(500);
-//        writeLCD('c',1,100);
-//        delayUs(500);
-//        clearLCD();
-//    }
-//}
+void testWriteLCD(){
+
+    while(1){
+        delayUs(500);
+        writeLCD('p',1,100);
+        delayUs(500);
+        clearLCD();
+    }
+}
