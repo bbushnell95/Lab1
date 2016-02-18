@@ -49,6 +49,7 @@
 void writeFourBits(unsigned char word, unsigned int commandType, unsigned int delayAfter, unsigned int lower){
     //TODO:
     // set the commandType (RS value)
+    int a;
     LCD_RS=commandType;
     
     //LATEbits.LATE1 = 1;
@@ -61,7 +62,9 @@ void writeFourBits(unsigned char word, unsigned int commandType, unsigned int de
     }
     else if (lower==0)
     {
+        a = (word&0x10)>>4;
     LCD_D4_0 = (word&0x10)>>4;     //16
+    a = (word&0x20) >> 5;
     LCD_D5_1 = (word&0x20)>>5;     //32
     LCD_D6_2 = (word&0x40)>>6;     //64
     LCD_D7_3 = (word&0x80)>>7;     //128
@@ -74,6 +77,8 @@ void writeFourBits(unsigned char word, unsigned int commandType, unsigned int de
     LCD_E=0;
     delayUs(delayAfter);
     //delayUs(50);
+    
+    LCD_RS = 0; // Put the RS back down irregardless of if up or not. -Matt
      
 }
 
@@ -111,11 +116,10 @@ void initLCD(void) {
 
     
     // Enable 4-bit interface
-    delayMs(25);     //delay 15ms
+    delayMs(15);     //delay 15ms
 
     writeFourBits(0b00110000, 0, 4500, 0);
     
-
     writeFourBits(0b00110000, 0, 200, 0);
    
     writeFourBits(0b00110000, 0, 0, 0); 
@@ -123,7 +127,7 @@ void initLCD(void) {
     // Function Set (specifies data width, lines, and font.
 
     writeFourBits(0b00101011, 0, 0,0);
-    writeFourBits(0b00101011, 0, 40,1);
+    writeFourBits(0b00101011, 0, 40,1); // CHECK NF in initialization
     // 4-bit mode initialization is complete. We can now configure the various LCD
     // options to control how the LCD will function.
 
@@ -152,11 +156,14 @@ void initLCD(void) {
  */
 void printStringLCD(const char* s) {
     //TODO:
-    while(&s!=NULL)
+ 
+    
+    while(*s != '\0')
     {
-    printCharLCD(*s);   //need to write this function
-    s=s+1;
+    printCharLCD( *s );   //need to write this function
+    s++;
     }
+    clearLCD();
 }
 
 /*
@@ -214,8 +221,8 @@ void moveCursorLCD(unsigned char x, unsigned char y)
         else if(x==16)c=0b11001111;
     }
     
-    writeFourBits(c, 1, 0,0);
-    writeFourBits(c, 1, 40,1);
+    writeFourBits(c, 0, 0,0); // Fixed RS to 0 - Matt
+    writeFourBits(c, 0, 40,1);
 }
 
 /*
@@ -228,6 +235,7 @@ void testLCD(){
     int i = 0;
     printCharLCD('c');
     for(i = 0; i < 1000; i++) delayUs(1000);
+    //delayUs(50);
     clearLCD();
     printStringLCD("Hello!");
     moveCursorLCD(1, 2);

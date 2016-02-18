@@ -31,8 +31,8 @@ int main(void)
 
     while(1)
     {
-        testWriteLCD();
-        
+        moveCursorLCD(1,1);  // x,y set top left corner.
+        testLCD();
     }
     
     return 0;
