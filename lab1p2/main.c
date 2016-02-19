@@ -25,14 +25,16 @@ int main(void)
     enableInterrupts();
     initTimer1();
     initTimer2();
-    //initLEDs();
     initLCD();
     
 
     while(1)
     {
-        moveCursorLCD(1,1);  // x,y set top left corner.
-        testLCD();
+        printCharLCD('c');
+        delayMs(100);
+        clearLCD();
+        
+        //testLCD();
     }
     
     return 0;
