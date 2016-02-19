@@ -42,4 +42,3 @@ void __attribute__ ((nomips16)) CheKseg0CacheOn();
 
 #endif	/* INTERRUPT_H */
 
-
