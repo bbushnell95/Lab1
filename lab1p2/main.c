@@ -21,20 +21,18 @@
 
 int main(void)
 {
+    int i=0;
     SYSTEMConfigPerformance(10000000);
     enableInterrupts();
     initTimer1();
     initTimer2();
     initLCD();
     
-
+    
     while(1)
     {
-        printCharLCD('c');
-        delayMs(100);
-        clearLCD();
-        
-        //testLCD();
+    testLCD();    
+
     }
     
     return 0;
