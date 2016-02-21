@@ -47,8 +47,7 @@
  * when you are simply writing a character. Otherwise, RS is '0'.
  */
 void writeFourBits(unsigned char word, unsigned int commandType, unsigned int delayAfter, unsigned int lower){
-    //TODO:
-    // set the commandType (RS value)
+
     int a;
     LCD_RS = commandType;
     
@@ -74,7 +73,7 @@ void writeFourBits(unsigned char word, unsigned int commandType, unsigned int de
     //disable
     LCD_E=0;
     delayUs(1);
-    LCD_RS = 0;
+    LCD_RS = 0; // SYD: changed position and added delay since person told me to...
     delayUs(1);
     delayUs(delayAfter);
     //delayUs(50);
@@ -87,7 +86,6 @@ void writeFourBits(unsigned char word, unsigned int commandType, unsigned int de
  * to the LCD.
  */
 void writeLCD(unsigned char word, unsigned int commandType, unsigned int delayAfter){
-    //TODO:
     writeFourBits(word,commandType,delayAfter,0);
     writeFourBits(word,commandType,delayAfter,1);
 }
@@ -95,10 +93,11 @@ void writeLCD(unsigned char word, unsigned int commandType, unsigned int delayAf
 /* Given a character, write it to the LCD. RS should be set to the appropriate value.
  */
 void printCharLCD(char c) {
-    writeLCD(c,1,50);      // passing correct ascii value
+    writeLCD(c, 1, 50);      // passing correct ascii value
 }
-/*Initialize the LCD
- */
+
+//Initialize the LCD
+
 void initLCD(void) {
     // Setup D, RS, and E to be outputs (0).
     
@@ -113,80 +112,44 @@ void initLCD(void) {
     // commands can be utilized. The first few initilition commands cannot be done using the
     // WriteLCD function. Additionally, the specific sequence and timing is very important.
 
-    
     // Enable 4-bit interface
     /*SYD: 
      wait 15ms or more after Vdd reaches 4.5V
      */
     delayMs(15);     //delay 15ms
-
     /*SYD:
      set RS 0 R/W 0 DB7-4 0 0 1 1
      * delay 4.1 ms
      */
-    
     writeFourBits(0b00110000, 0, 4100, 0);
-    
     /*SYD:
      set RS 0 R/W 0 DB7-4 0 0 1 1
      * wait 100 us or more
      */
     writeFourBits(0b00110000, 0, 100, 0);
-   
     /*SYD:
      * set RS 0 R/W 0 DB7-4 0 0 1 1 (upper)
      * no delay
      * set DB7-4 0 0 1 0
      * delay 40 us
      */
-    
-//    writeFourBits(0b00110000, 0, 0, 0); 
-//    writeFourBits(0b00100000, 0, 40, 0);
    
     writeLCD(0b00110000, 0, 40);
     
     // Function Set (specifies data width, lines, and font.
 
-    /*SYD:
-     Function Set Initialization
-     */
-//    writeFourBits(0b00101011, 0, 0, 0);
-//    writeFourBits(0b00101011, 0, 40, 1); // CHECK NF in initialization
+    //SYD: Function Set Initialization
     // 4-bit mode initialization is complete. We can now configure the various LCD
     // options to control how the LCD will function.
-    
     writeLCD(0b00101011, 0, 40);
-
-    /*SYD:
-     Display Off Init
-     */
-    
+    //SYD: Display Off Init
     writeLCD(0b00001000, 0, 40);
-//    writeFourBits(0b00001000, 0, 0, 0);
-//    writeFourBits(0b00001000, 0, 40, 1);
-    
-    /*SYD:
-     Display Clear
-     */
+    //SYD:Display Clear
     writeLCD(0b00000001, 0, 0);
-//     writeFourBits(0b00000001, 0, 0, 0);
-//     writeFourBits(0b00000001, 0, 1640, 1);
-  
-     /*SYD:
-     Entry Mode Set
-     */
+    //SYD: Entry Mode Set
     writeLCD(0b00000110, 0, 40);
-//    writeFourBits(0b00000110, 0, 0, 0);
-//    writeFourBits(0b00000110, 0, 40, 1); // CHECK VALS for I/D and S
     // TODO: Display On/Off Control
         // Turn Display (D) On, Cursor (C) Off, and Blink(B) Off
-    
-    // turning on blink
-//    
-//    writeFourBits(0b00000100, 0, 0, 0);
-//    writeFourBits(0b00000100, 0, 40, 1);
-    
-   // moveCursorLCD(1, 2);
 }
 
 /*
@@ -198,24 +161,21 @@ void printStringLCD(const char* s) {
 
     int i = 0;
     while(*s != '\0'){
-        printCharLCD( s[i] );// changed to black instead of random characters
+        printCharLCD( s[i] );// SYD: changed to black instead of random characters (which is apparently better)
        // s++;
         i++;
     }
     clearLCD();
 }
 
-/*
- * Clear the display.
- */
+
+//Clear the display.
 void clearLCD(){
     writeFourBits(0b00000001,0, 100, 0);
     writeFourBits(0b00000001,0, 100, 1);
 }
 
-/*
- Use the command for changing the DD RAM address to put the cursor somewhere.
- */
+// Use the command for changing the DD RAM address to put the cursor somewhere.
 void moveCursorLCD(unsigned char x, unsigned char y)
 {
     char c=NULL;
@@ -273,7 +233,6 @@ void testLCD(){
     int i = 0;
     printCharLCD('c');
     for(i = 0; i < 1000; i++) delayUs(1000);
-    //delayUs(50);
     clearLCD();
     printStringLCD("Hello!");
     moveCursorLCD(1, 2);
