@@ -1,6 +1,10 @@
 /*
- * File:   lcd.c
- * Authors:
+ * File:         ldc.c
+ * Date:         2-22-2016
+ * Software Designer: Ryan Trumpinski
+ * Hardware Designer: Brett Bushnell
+ * Quality Assurance: Sydney Clark
+ * Systems Integrator: Matt Dzurick
  *
  * Created on December 31, 2014, 1:39 PM
  */

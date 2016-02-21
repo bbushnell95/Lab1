@@ -1,8 +1,11 @@
 // ******************************************************************************************* //
 //
-// File:         lab1p2.c
-// Date:         12-30-2014
-// Authors:      Garrett Vanhoy
+// File:         main.c
+// Date:         2-22-2016
+// Software Designer: Ryan Trumpinski
+// Hardware Designer: Brett Bushnell
+// Quality Assurance: Sydney Clark
+// Systems Integrator: Matt Dzurick
 //
 // Description: 
     // ******************************************************************************************* //
@@ -24,7 +27,7 @@
 void incrimentcount();
 
 typedef enum stateTypeEnum{
-    ledrun,ledstop, wait, wait2, debouncePress, debounceRelease, debounceRelease2
+    ledrun,ledstop, wait, wait2, debouncePress, debounceRelease, debounceRelease2, debounceReset
 } stateType;
 
 volatile int switchFlag=0;
@@ -53,6 +56,7 @@ int main(void)
     initTimer3();
     initLEDs();
     initLCD();
+    int j = 0;
     
     TRISDbits.TRISD0 = 0;
     LATDbits.LATD0 = 1;
@@ -61,13 +65,13 @@ int main(void)
     {
         switch(state){                          //LED 1 is on
               case  ledrun:
+                  reset = 0;
                   if(PrevState==2)
                   {
                     LEDRUN=ON;
                     LEDSTOP=OFF;
                     T3CONbits.TON=1;
                     PrevState=1;
-                    reset=0;
                     moveCursorLCD(1,1);
                     printStringLCD(running);
                   }
@@ -91,6 +95,7 @@ int main(void)
                     PrevState=2;
                     moveCursorLCD(1,1);
                     printStringLCD(stopped);
+                    j = 0;
                    }
                      if(switchFlag==1)              //if switch is pressed
                         {
@@ -99,32 +104,54 @@ int main(void)
                         }
                      if(reset==1)
                     {
-                         //delayMs(50);
-                      TMR3=0;
-                      reset=0;
-                      hundred=0;
-                      ten=0;
-                      onesec=0;
-                      tensec=0;
-                      onemin=0;
-                      tenmin=0;
-                      
-                      moveCursorLCD(1,2);
-                      printCharLCD(tenmin+'0');
-                      printCharLCD(onemin+'0');
-                      printCharLCD(':');
-                      printCharLCD(tensec+'0');
-                      printCharLCD(onesec+'0');
-                      printCharLCD(':');
-                      printCharLCD(ten+'0');
-                      printCharLCD(hundred+'0');
-                      
+                         reset = 0;
+                         state = debounceReset;
                     }
                     break;    
               case debouncePress:               //calls delay and moves to wait state
                   delayMs(50);
                   state=wait;
                   break;
+                  
+            case debounceReset:
+                /* Debounce the press. */
+                delayMs(50);
+                
+                /* Reset timer 3 to 0. It is already turned off in ledstop. */
+                TMR3=0;
+                reset=0;
+                
+                /* Resets volatile variables for the counting function. */
+                hundred=0;
+                ten=0;
+                onesec=0;
+                tensec=0;
+                onemin=0;
+                tenmin=0;
+                
+                /* Set the time on the display back to zero. */
+                moveCursorLCD(1,2);
+                printCharLCD('0');
+                printCharLCD('0');
+                printCharLCD(':');
+                printCharLCD('0');
+                printCharLCD('0');
+                printCharLCD(':');
+                printCharLCD('0');
+                printCharLCD('0');
+                
+                /* Wait until the switch is released. */
+                while (reset != 1) {  }
+        
+                /* Turn reset back to zero for future logic. */
+                reset = 0;
+                
+                /* Debounce the release. */
+                delayMs(50);
+                
+                /* Go back to ledstop. */
+                state = ledstop;
+                break;
     
               case debounceRelease:             //calls delay and moves to wait 2 aka logic state
                   delayMs(50);
@@ -167,6 +194,7 @@ void __ISR(_CHANGE_NOTICE_VECTOR, IPL7SRS) _CNInterrupt(void){
     PORTD;
     IFS1bits.CNDIF=0;
     reset=1;
+    
     }
 }
 
