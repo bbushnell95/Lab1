@@ -17,10 +17,11 @@
 
 #define LEDRUN LATGbits.LATG12  
 #define LEDSTOP LATGbits.LATG14
-#define EXTERNAL LATAbits.LATA7
 #define ON 1
 #define OFF 0
 #define PRESSED 0
+
+void incrimentcount();
 
 typedef enum stateTypeEnum{
     ledrun,ledstop, wait, wait2, debouncePress, debounceRelease, debounceRelease2
@@ -35,32 +36,38 @@ volatile int onesec=0;
 volatile int tensec=0;
 volatile int onemin=0;
 volatile int tenmin=0;
-volatile const char* running = "Running";
-volatile const char* stopped="Stopped";
+const char* running = "Running:";
+const char* stopped="Stopped:";
 // ******************************************************************************************* //
-int PrevState=1; 
+int PrevState=2; 
 int state=ledrun;
 
 int main(void)
 {
     SYSTEMConfigPerformance(10000000);
+    enableInterrupts();
     initSwitch1();
     initSW2();
-    initLCD();
+    initTimer1();
     initTimer2();
+    initTimer3();
     initLEDs();
+    initLCD();
     
     while(1)
     {
         switch(state){                          //LED 1 is on
               case  ledrun:
+                  if(PrevState==2)
+                  {
                     LEDRUN=ON;
                     LEDSTOP=OFF;
-                    T2CONbits.ON=1;
+                    T3CONbits.TON=1;
                     PrevState=1;
                     reset=0;
                     moveCursorLCD(1,1);
                     printStringLCD(running);
+                  }
                     if(switchFlag==1)              //if switch is pressed
                   {
                       switchFlag=0;
@@ -72,12 +79,15 @@ int main(void)
                     }
                     break;
                case ledstop:                       //LED 2 is on
-                    LEDRUN=OFF;
+                   if(PrevState==1)
+                   {
+                   LEDRUN=OFF;
                     LEDSTOP=ON;
-                    T2CONbits.ON=0;
+                    T3CONbits.TON=0;
                     PrevState=2;
                     moveCursorLCD(1,1);
                     printStringLCD(stopped);
+                   }
                      if(switchFlag==1)              //if switch is pressed
                         {
                             switchFlag=0;
@@ -85,7 +95,7 @@ int main(void)
                         }
                      if(reset==1)
                     {
-                      TMR2=0;
+                      TMR3=0;
                       reset=0;
                       hundred=0;
                       ten=0;
@@ -93,6 +103,16 @@ int main(void)
                       tensec=0;
                       onemin=0;
                       tenmin=0;
+                      
+                      moveCursorLCD(1,2);
+                      printCharLCD(tenmin+'0');
+                      printCharLCD(onemin+'0');
+                      printCharLCD(':');
+                      printCharLCD(tensec+'0');
+                      printCharLCD(onesec+'0');
+                      printCharLCD(':');
+                      printCharLCD(ten+'0');
+                      printCharLCD(hundred+'0');
                       
                     }
                     break;    
@@ -107,11 +127,7 @@ int main(void)
                   break;
    
                 case wait:                      //waits until switch is released
-                    if(switchFlag==0)
-                    {
-                        state=wait;
-                    }
-                    else
+                    if(switchFlag==1)
                     {
                         switchFlag=0;
                         state=debounceRelease;
@@ -133,53 +149,31 @@ int main(void)
     return 0;
 }
 
-
-void tesDelayUs(){
-    while (1)
-    {
-        LATDbits.LATD0=0;
-        delayUs(5);
-        LATDbits.LATD0=1;
-        delayUs(5);
-    }
-}
-
-void testWriteLCD()
-{
-    while(1)
-    {
-        delayUs(500);
-        writeLCD('c',1,100);
-        delayUs(500);
-        clearLCD();
-    }
-}
-
-
 void __ISR(_CHANGE_NOTICE_VECTOR, IPL7SRS) _CNInterrupt(void){
     //TODO: Implement the interrupt to capture the press of the button
+    if(IFS1bits.CNAIF==1)
+    {
     PORTA;
     IFS1bits.CNAIF=0;
     switchFlag=1;
-}
-
-void __ISR(_CHANGE_NOTICE_VECTOR, IPL7SRS) _CN2Interrupt(void){
-    //TODO: Implement the interrupt to capture the press of the button
+    }
+    else if(IFS1bits.CNDIF==1)
+    {
     PORTD;
     IFS1bits.CNDIF=0;
     reset=1;
+    }
 }
 
-void __ISR(_TIMER_2_VECTOR, IPL7SRS) __T2Interupt()
+
+void __ISR(_TIMER_3_VECTOR, IPL7SRS) __T3Interupt()
 {
-    IFS0bits.T2IF=0;
+    IFS0bits.T3IF=0;
     countflag=1;
 }
 
 void incrimentcount()
 {
-    
-    
     hundred++;
     
     if(hundred==10)
@@ -209,21 +203,20 @@ void incrimentcount()
     }
     if(tenmin==10)
     {
-    int hundred=0;
-    int ten=0;
-    int onesec=0;
-    int tensec=0;
-    int onemin=0;
-    int tenmin=0;
+    hundred=0;
+    ten=0;
+    onesec=0;
+    tensec=0;
+    onemin=0;
+    tenmin=0;
     }
-    
     moveCursorLCD(1,2);
-    writeLCD(tenmin);
-    writeLCD(onemin);
-    writeLCD(00111010);
-    writeLCD(tensec);
-    writeLCD(onesec);
-    writeLCD(00111010);
-    writeLCD(ten);
-    writeLCD(hundred);
+    printCharLCD(tenmin+'0');
+    printCharLCD(onemin+'0');
+    printCharLCD(':');
+    printCharLCD(tensec+'0');
+    printCharLCD(onesec+'0');
+    printCharLCD(':');
+    printCharLCD(ten+'0');
+    printCharLCD(hundred+'0');
 }
