@@ -1,6 +1,10 @@
 /*
- * File:   lcd.c
- * Authors:
+ * File:         ldc.c
+ * Date:         2-22-2016
+ * Software Designer: Ryan Trumpinski
+ * Hardware Designer: Brett Bushnell
+ * Quality Assurance: Sydney Clark
+ * Systems Integrator: Matt Dzurick
  *
  * Created on December 31, 2014, 1:39 PM
  */
@@ -37,7 +41,7 @@
 #define LCD_D4_0  LATEbits.LATE7
 #define LCD_RS  LATCbits.LATC4
 #define LCD_E   LATCbits.LATC2
-#define LCD_RW  LATCbits.LATC12
+
 
 /* This function should take in a two-byte word and writes either the lower or upper
  * byte to the last four bits of LATE. Additionally, according to the LCD data sheet
@@ -49,31 +53,38 @@
 void writeFourBits(unsigned char word, unsigned int commandType, unsigned int delayAfter, unsigned int lower){
     //TODO:
     // set the commandType (RS value)
-    LCD_RS=commandType;
-    LCD_RW=0;
+    int a;
+    LCD_RS = commandType;
     
-    if (lower==1)
-    {
-    LCD_D4_0 = word&0x01;
-    LCD_D5_1 = (word&0x02)>>1;
-    LCD_D6_2 = (word&0x04)>>2;
-    LCD_D7_3 = (word&0x08)>>3;
+    //LATEbits.LATE1 = 1;
+    if (lower == 1) {
+        LCD_D4_0 = word&0x01;
+        LCD_D5_1 = (word&0x02)>>1;
+        LCD_D6_2 = (word&0x04)>>2;
+        LCD_D7_3 = (word&0x08)>>3;
     }
-    else if (lower==0)
-    {
-    LCD_D4_0 = (word&0x10)>>4;     //16
-    LCD_D5_1 = (word&0x20)>>5;     //32
-    LCD_D6_2 = (word&0x40)>>6;     //64
-    LCD_D7_3 = (word&0x80)>>7;     //128
+    else if (lower == 0){
+        a = (word&0x10)>>4;
+        LCD_D4_0 = (word&0x10)>>4;     //16
+        a = (word&0x20) >> 5;
+        LCD_D5_1 = (word&0x20)>>5;     //32
+        LCD_D6_2 = (word&0x40)>>6;     //64
+        LCD_D7_3 = (word&0x80)>>7;     //128
     }
     //enable
-    LCD_E=1;
+    LCD_E = 1;
     //delay
-    delayUs(delayAfter);          
+    delayUs(1);          
     //disable
     LCD_E=0;
-    
+    delayUs(1);
+    LCD_RS = 0;
+    delayUs(1);
+    delayUs(delayAfter);
     //delayUs(50);
+    
+    // Put the RS back down irregardless of if up or not. -Matt (Gretchen)
+     
 }
 
 /* Using writeFourBits, this function should write the two bytes of a character
@@ -81,28 +92,26 @@ void writeFourBits(unsigned char word, unsigned int commandType, unsigned int de
  */
 void writeLCD(unsigned char word, unsigned int commandType, unsigned int delayAfter){
     //TODO:
-    writeFourBits(word,commandType,delayAfter,0);
+    writeFourBits(word,commandType,1,0);    //trying this out..
     writeFourBits(word,commandType,delayAfter,1);
 }
 
 /* Given a character, write it to the LCD. RS should be set to the appropriate value.
  */
 void printCharLCD(char c) {
-    //TODO:
-    writeLCD(c,1,50);      
-    
+    writeLCD(c,1,50);      // passing correct ascii value
 }
 /*Initialize the LCD
  */
 void initLCD(void) {
     // Setup D, RS, and E to be outputs (0).
     
-    TRIS_D7 =0;
-    TRIS_D6 =0;
-    TRIS_D5 =0;
-    TRIS_D4 =0;
-    TRIS_RS =0;
-    TRIS_E  =0;
+    TRIS_D7 = 0;
+    TRIS_D6 = 0;
+    TRIS_D5 = 0;
+    TRIS_D4 = 0;
+    TRIS_RS = 0;
+    TRIS_E  = 0;
 
     // Initilization sequence utilizes specific LCD commands before the general configuration
     // commands can be utilized. The first few initilition commands cannot be done using the
@@ -110,39 +119,84 @@ void initLCD(void) {
 
     
     // Enable 4-bit interface
-    delayUs(15000);     //delay 15ms
+    /*SYD: 
+     wait 15ms or more after Vdd reaches 4.5V
+     */
+    delayMs(15);     //delay 15ms
 
-    writeFourBits(0b00110000, 0, 4100, 0);
+    /*SYD:
+     set RS 0 R/W 0 DB7-4 0 0 1 1
+     * delay 4.1 ms
+     */
     
-
-    writeFourBits(0b00110000, 0, 100, 0);
+    writeFourBits(0b00110000, 0, 4200, 0);      //waiting just a bit longer
+    
+    /*SYD:
+     set RS 0 R/W 0 DB7-4 0 0 1 1
+     * wait 100 us or more
+     */
+    writeFourBits(0b00110000, 0, 150, 0);       //waiting just a bit longer
+    
+//    writeFourBits(0b00110010, 0, 10, 0);        //not sure why this was missing???
+//    writeFourBits(0b00110010, 0, 10, 1);        //this too?????
+    /*SYD:
+     * set RS 0 R/W 0 DB7-4 0 0 1 1 (upper)
+     * no delay
+     * set DB7-4 0 0 1 0
+     * delay 40 us
+     */
+    
+//    writeFourBits(0b00110000, 0, 0, 0); 
+//    writeFourBits(0b00100000, 0, 40, 0);
    
-    writeFourBits(0b00110000, 0, 0, 0);
+    writeLCD(0b00110010, 0, 40);
     
-    writeFourBits(0b00100000, 0, 0, 0);
     // Function Set (specifies data width, lines, and font.
 
-    writeFourBits(0b00101011, 0, 0,0);
-    writeFourBits(0b00101011, 0, 0,1);
+    /*SYD:
+     Function Set Initialization
+     */
+//    writeFourBits(0b00101011, 0, 0, 0);
+//    writeFourBits(0b00101011, 0, 40, 1); // CHECK NF in initialization
     // 4-bit mode initialization is complete. We can now configure the various LCD
     // options to control how the LCD will function.
+    
+    writeLCD(0b00101000, 0, 40);
 
-    // TODO: Display On/Off Control
-        // Turn Display (D) Off
-
-    writeFourBits(0b00001000, 0, 0,0);
-    writeFourBits(0b00001000, 0, 0,1);
-    // TODO: Clear Display (The delay is not specified in the data sheet at this point. You really need to have the clear display delay here.
-
-     writeFourBits(0b00000001, 0, 0,0);
-     writeFourBits(0b00000001, 0, 0,1);
-    // TODO: Entry Mode Set
-        // Set Increment Display, No Shift (i.e. cursor move)
-
-    writeFourBits(0b00000111, 0, 0,0);
-    writeFourBits(0b00000111, 0, 0,1);
+    /*SYD:
+     Display Off Init
+     */
+    
+    writeLCD(0b00001000, 0, 40);      //testing
+    //writeLCD(0b00001011, 0, 40);
+    
+//    writeFourBits(0b00001000, 0, 0, 0);
+//    writeFourBits(0b00001000, 0, 40, 1);
+    
+    /*SYD:
+     Display Clear
+     */
+    writeLCD(0b00000001, 0, 1640);
+//     writeFourBits(0b00000001, 0, 0, 0);
+//     writeFourBits(0b00000001, 0, 1640, 1);
+  
+     /*SYD:
+     Entry Mode Set
+     */
+    writeLCD(0b00000110, 0, 40);
+    
+//    writeFourBits(0b00000110, 0, 0, 0);
+//    writeFourBits(0b00000110, 0, 40, 1); // CHECK VALS for I/D and S
     // TODO: Display On/Off Control
         // Turn Display (D) On, Cursor (C) Off, and Blink(B) Off
+    
+    // turning on blink
+//    
+//    writeFourBits(0b00000100, 0, 0, 0);
+//    writeFourBits(0b00000100, 0, 40, 1);
+    
+   // moveCursorLCD(1, 2);
+    writeLCD(0b00001111, 0, 40);
 }
 
 /*
@@ -151,21 +205,22 @@ void initLCD(void) {
  * Since a string is just a character array, try to be clever with your use of pointers.
  */
 void printStringLCD(const char* s) {
-    //TODO:
-    while(&s!=NULL)
-    {
-    printCharLCD(*s);   //need to write this function
-    s=s+1;
+
+    int i = 0;
+    while(s[i] != '\0'){
+        printCharLCD( s[i] );// changed to black instead of random characters
+       // s++;
+        i++;
     }
+    //clearLCD();
 }
 
 /*
  * Clear the display.
  */
-void clearLCD()
-{
-    writeFourBits(0b00000001,0, 100, 0);
-    writeFourBits(0b00000001,0, 100, 1);
+void clearLCD(){
+    writeFourBits(0b00000001,0, 1, 0);
+    writeFourBits(0b00000001,0, 1640, 1);
 }
 
 /*
@@ -177,7 +232,7 @@ void moveCursorLCD(unsigned char x, unsigned char y)
 
     if(y==1)
     {
-        if(x==1) c=0b00000000;
+        if(x==1) c=0b10000000;
         else if(x==2)c=0b10000001;
         else if(x==3)c=0b10000010;
         else if(x==4)c=0b10000011;
@@ -214,8 +269,10 @@ void moveCursorLCD(unsigned char x, unsigned char y)
         else if(x==16)c=0b11001111;
     }
     
-    writeFourBits(c, 1, 0,0);
-    writeFourBits(c, 1, 40,1);
+    //writeFourBits(c, 0, 0,0); // Fixed RS to 0 - Matt
+    //writeFourBits(c, 0, 40,1);
+    
+    writeLCD(c,0,40);
 }
 
 /*
