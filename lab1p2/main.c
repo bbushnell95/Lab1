@@ -31,7 +31,9 @@ int main(void)
     
     while(1)
     {
-    testLCD();    
+    //testLCD();
+    printStringLCD("Purple");
+    for(i = 0; i < 1000; i++) delayUs(1000);
 
     }
     

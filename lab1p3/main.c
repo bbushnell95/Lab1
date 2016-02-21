@@ -54,6 +54,9 @@ int main(void)
     initLEDs();
     initLCD();
     
+    TRISDbits.TRISD0 = 0;
+    LATDbits.LATD0 = 1;
+    
     while(1)
     {
         switch(state){                          //LED 1 is on
@@ -75,6 +78,7 @@ int main(void)
                   }
                     if(countflag==1)
                     {
+                        countflag = 0;
                         incrimentcount();
                     }
                     break;
@@ -95,6 +99,7 @@ int main(void)
                         }
                      if(reset==1)
                     {
+                         //delayMs(50);
                       TMR3=0;
                       reset=0;
                       hundred=0;
@@ -170,7 +175,10 @@ void __ISR(_TIMER_3_VECTOR, IPL7SRS) __T3Interupt()
 {
     IFS0bits.T3IF=0;
     countflag=1;
+    if (LATDbits.LATD0 == 0) LATDbits.LATD0 = 1;
+    else if (LATDbits.LATD0 == 1) LATDbits.LATD0 = 0;
 }
+
 
 void incrimentcount()
 {

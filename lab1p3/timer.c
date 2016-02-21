@@ -49,10 +49,9 @@ void delayUs(unsigned int delay){
 
 void initTimer3(){
     TMR3=0;
-    T3CONbits.TCKPS=7; // Prescalar of 2.
-    //T3CONbits.TGATE=1;
-    //T3CONbits.TCS=0;
-    PR3=390;
+    T3CONbits.TCKPS=1; // Prescalar of 2.
+    //PR3 = 49999; // Seems to have some error in the value.
+    PR3=40000; // This is a value found on the oscilloscope to support 10 ms.
     IFS0bits.T3IF=0;        //interrupt flag is down
     IEC0bits.T3IE=1;
     IPC3bits.T3IP=7;

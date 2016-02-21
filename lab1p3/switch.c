@@ -11,6 +11,10 @@ void initSwitch1(){         //initialize switch and pull up resistor
     TRISDbits.TRISD6=1;
     CNPUDbits.CNPUD6=1;
     CNCONDbits.ON=0;        //turn on CN for port D
+    CNENDbits.CNIED6=1;        //check
+    IFS1bits.CNDIF=0;
+    IEC1bits.CNDIE=1;
+    IPC8bits.CNIP=7;       //check
 }
 
 
