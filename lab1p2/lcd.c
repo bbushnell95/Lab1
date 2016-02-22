@@ -5,8 +5,7 @@
  * Created on December 31, 2014, 1:39 PM
  */
 
-/* TODO: Make define statements for each pin used in the LCD
- */
+
 #include <xc.h>
 #include "lcd.h"
 #include "timer.h"
@@ -47,12 +46,8 @@
  * when you are simply writing a character. Otherwise, RS is '0'.
  */
 void writeFourBits(unsigned char word, unsigned int commandType, unsigned int delayAfter, unsigned int lower){
-    //TODO:
-    // set the commandType (RS value)
-    int a;
     LCD_RS = commandType;
-    
-    //LATEbits.LATE1 = 1;
+
     if (lower == 1) {
         LCD_D4_0 = word&0x01;
         LCD_D5_1 = (word&0x02)>>1;
@@ -60,157 +55,96 @@ void writeFourBits(unsigned char word, unsigned int commandType, unsigned int de
         LCD_D7_3 = (word&0x08)>>3;
     }
     else if (lower == 0){
-        a = (word&0x10)>>4;
         LCD_D4_0 = (word&0x10)>>4;     //16
-        a = (word&0x20) >> 5;
         LCD_D5_1 = (word&0x20)>>5;     //32
         LCD_D6_2 = (word&0x40)>>6;     //64
         LCD_D7_3 = (word&0x80)>>7;     //128
     }
-    //enable
-    LCD_E = 1;
-    //delay
-    delayUs(1);          
-    //disable
-    LCD_E=0;
+    
+    LCD_E = 1;          //enable
+    delayUs(1);          //delay        
+    LCD_E=0;            //disable   
     delayUs(1);
     LCD_RS = 0;
     delayUs(1);
-    delayUs(delayAfter);
-    //delayUs(50);
-    
-    // Put the RS back down irregardless of if up or not. -Matt (Gretchen)
-     
+    delayUs(delayAfter);//delay
 }
 
 /* Using writeFourBits, this function should write the two bytes of a character
  * to the LCD.
  */
 void writeLCD(unsigned char word, unsigned int commandType, unsigned int delayAfter){
-    //TODO:
-    writeFourBits(word,commandType,1,0);    //trying this out..
+    writeFourBits(word,commandType,1,0);   
     writeFourBits(word,commandType,delayAfter,1);
 }
 
 /* Given a character, write it to the LCD. RS should be set to the appropriate value.
  */
 void printCharLCD(char c) {
-    writeLCD(c,1,50);      // passing correct ascii value
+    writeLCD(c,1,50);     
 }
-/*Initialize the LCD
- */
-void initLCD(void) {
-    // Setup D, RS, and E to be outputs (0).
-    
-    TRIS_D7 = 0;
+void initLCD(void) {    
+    TRIS_D7 = 0;        //everything is an output
     TRIS_D6 = 0;
     TRIS_D5 = 0;
     TRIS_D4 = 0;
     TRIS_RS = 0;
     TRIS_E  = 0;
 
-    // Initilization sequence utilizes specific LCD commands before the general configuration
-    // commands can be utilized. The first few initilition commands cannot be done using the
-    // WriteLCD function. Additionally, the specific sequence and timing is very important.
-
-    
     // Enable 4-bit interface
-    /*SYD: 
-     wait 15ms or more after Vdd reaches 4.5V
-     */
-    delayMs(15);     //delay 15ms
+    delayMs(15);    // wait 15ms or more after Vdd reaches 4.5V
 
     /*SYD:
      set RS 0 R/W 0 DB7-4 0 0 1 1
-     * delay 4.1 ms
+     * delay 4.2 ms
      */
     
-    writeFourBits(0b00110000, 0, 4200, 0);      //waiting just a bit longer
+    writeFourBits(0b00110000, 0, 4200, 0);      
     
     /*SYD:
      set RS 0 R/W 0 DB7-4 0 0 1 1
      * wait 100 us or more
      */
-    writeFourBits(0b00110000, 0, 150, 0);       //waiting just a bit longer
+    writeFourBits(0b00110000, 0, 150, 0);       
     
-//    writeFourBits(0b00110010, 0, 10, 0);        //not sure why this was missing???
-//    writeFourBits(0b00110010, 0, 10, 1);        //this too?????
     /*SYD:
      * set RS 0 R/W 0 DB7-4 0 0 1 1 (upper)
      * no delay
      * set DB7-4 0 0 1 0
      * delay 40 us
-     */
-    
-//    writeFourBits(0b00110000, 0, 0, 0); 
-//    writeFourBits(0b00100000, 0, 40, 0);
-   
+     */   
     writeLCD(0b00110010, 0, 40);
-    
-    // Function Set (specifies data width, lines, and font.
-
     /*SYD:
      Function Set Initialization
      */
-//    writeFourBits(0b00101011, 0, 0, 0);
-//    writeFourBits(0b00101011, 0, 40, 1); // CHECK NF in initialization
-    // 4-bit mode initialization is complete. We can now configure the various LCD
-    // options to control how the LCD will function.
-    
     writeLCD(0b00101000, 0, 40);
-
     /*SYD:
      Display Off Init
      */
-    
-    writeLCD(0b00001000, 0, 40);      //testing
-    //writeLCD(0b00001011, 0, 40);
-    
-//    writeFourBits(0b00001000, 0, 0, 0);
-//    writeFourBits(0b00001000, 0, 40, 1);
-    
+    writeLCD(0b00001000, 0, 40);     
     /*SYD:
      Display Clear
      */
     writeLCD(0b00000001, 0, 1640);
-//     writeFourBits(0b00000001, 0, 0, 0);
-//     writeFourBits(0b00000001, 0, 1640, 1);
-  
      /*SYD:
      Entry Mode Set
      */
     writeLCD(0b00000110, 0, 40);
-    
-//    writeFourBits(0b00000110, 0, 0, 0);
-//    writeFourBits(0b00000110, 0, 40, 1); // CHECK VALS for I/D and S
-    // TODO: Display On/Off Control
-        // Turn Display (D) On, Cursor (C) Off, and Blink(B) Off
-    
-    // turning on blink
-//    
-//    writeFourBits(0b00000100, 0, 0, 0);
-//    writeFourBits(0b00000100, 0, 40, 1);
-    
-   // moveCursorLCD(1, 2);
-    writeLCD(0b00001111, 0, 40);
+
+    writeLCD(0b00001111, 0, 40);        //turns display on w/ blinking cursor
 }
 
 /*
- * You can use printCharLCD here. Note that every time you write a character
- * the cursor increments its position automatically.
- * Since a string is just a character array, try to be clever with your use of pointers.
+ * function takes a constant char* and prints the string to the LCD
  */
 void printStringLCD(const char* s) {
 
     int i = 0;
     while(s[i] != '\0'){
-        printCharLCD( s[i] );// changed to black instead of random characters
-       // s++;
+        printCharLCD( s[i] );
         i++;
     }
-    //clearLCD();
 }
-
 /*
  * Clear the display.
  */
@@ -218,9 +152,10 @@ void clearLCD(){
     writeFourBits(0b00000001,0, 1, 0);
     writeFourBits(0b00000001,0, 1640, 1);
 }
-
 /*
  Use the command for changing the DD RAM address to put the cursor somewhere.
+ * Assigns C to be the binary value of any position the lcd then sends the command to the 
+ * LCD to move the cursor
  */
 void moveCursorLCD(unsigned char x, unsigned char y)
 {
@@ -264,10 +199,6 @@ void moveCursorLCD(unsigned char x, unsigned char y)
         else if(x==15)c=0b11001110;
         else if(x==16)c=0b11001111;
     }
-    
-    //writeFourBits(c, 0, 0,0); // Fixed RS to 0 - Matt
-    //writeFourBits(c, 0, 40,1);
-    
     writeLCD(c,0,40);
 }
 

@@ -14,15 +14,15 @@
 #define OUTPUT 0
 
 void initLEDs(){
-    ODCGbits.ODCG12=1;
+    ODCGbits.ODCG12=1;          //enables ODC for leds
     ODCGbits.ODCG14=1;
-    TRISGbits.TRISG12=OUTPUT;
+    TRISGbits.TRISG12=OUTPUT;      //configure LEDS as outputs
     TRISGbits.TRISG14=OUTPUT;
     
-    LATGbits.LATG12=1;
+    LATGbits.LATG12=1;              //Turn latches on
     LATGbits.LATG14=1;
     
-    LEDRUN=ON;
-    LEDSTOP=ON;
+    LEDRUN=ON;                      //initialize leds
+    LEDSTOP=OFF;
     
 }
