@@ -15,13 +15,11 @@ void initSwitch1(){         //initialize switch and pull up resistor
 
 
 void initSW2(){
-    //TODO: Initialize the appropriate pins to work with the external switch using a
-    //change notification interrupt.
-    TRISAbits.TRISA7=1;
+    TRISAbits.TRISA7=1;     //configure as input
     CNPUAbits.CNPUA7=1;
     CNCONAbits.ON=1;        
-    CNENAbits.CNIEA7=1;        //check
+    CNENAbits.CNIEA7=1;        //enable change notification
     IFS1bits.CNAIF=0;
     IEC1bits.CNAIE=1;
-    IPC8bits.CNIP=7;        //check
+    IPC8bits.CNIP=7;        //set priority
 }
