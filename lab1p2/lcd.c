@@ -123,25 +123,21 @@ void initLCD(void) {
      set RS 0 R/W 0 DB7-4 0 0 1 1
      * delay 4.1 ms
      */
-<<<<<<< HEAD
-    writeFourBits(0b00110000, 0, 4100, 0);
-=======
+
     
     writeFourBits(0b00110000, 0, 4200, 0);      //waiting just a bit longer
     
->>>>>>> f3963f359eceedb028eed795926b34bf6c10dc8f
+
     /*SYD:
      set RS 0 R/W 0 DB7-4 0 0 1 1
      * wait 100 us or more
      */
-<<<<<<< HEAD
-    writeFourBits(0b00110000, 0, 100, 0);
-=======
+
     writeFourBits(0b00110000, 0, 150, 0);       //waiting just a bit longer
     
 //    writeFourBits(0b00110010, 0, 10, 0);        //not sure why this was missing???
 //    writeFourBits(0b00110010, 0, 10, 1);        //this too?????
->>>>>>> f3963f359eceedb028eed795926b34bf6c10dc8f
+
     /*SYD:
      * set RS 0 R/W 0 DB7-4 0 0 1 1 (upper)
      * no delay
@@ -155,18 +151,7 @@ void initLCD(void) {
 
     //SYD: Function Set Initialization
     // 4-bit mode initialization is complete. We can now configure the various LCD
-    // options to control how the LCD will function.
-<<<<<<< HEAD
-    writeLCD(0b00101011, 0, 40);
-    //SYD: Display Off Init
-    writeLCD(0b00001000, 0, 40);
-    //SYD:Display Clear
-    writeLCD(0b00000001, 0, 0);
-    //SYD: Entry Mode Set
-    writeLCD(0b00000110, 0, 40);
-    // TODO: Display On/Off Control
-        // Turn Display (D) On, Cursor (C) Off, and Blink(B) Off
-=======
+
     
     writeLCD(0b00101000, 0, 40);
 
@@ -204,7 +189,7 @@ void initLCD(void) {
     
    // moveCursorLCD(1, 2);
     writeLCD(0b00001111, 0, 40);
->>>>>>> f3963f359eceedb028eed795926b34bf6c10dc8f
+
 }
 
 /*
@@ -215,13 +200,9 @@ void initLCD(void) {
 void printStringLCD(const char* s) {
 
     int i = 0;
-<<<<<<< HEAD
-    while(*s != '\0'){
-        printCharLCD( s[i] );// SYD: changed to black instead of random characters (which is apparently better)
-=======
+
     while(s[i] != '\0'){
         printCharLCD( s[i] );// changed to black instead of random characters
->>>>>>> f3963f359eceedb028eed795926b34bf6c10dc8f
        // s++;
         i++;
     }

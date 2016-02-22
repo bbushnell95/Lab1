@@ -17,6 +17,8 @@
 #include "config.h"
 #include "interrupt.h"
 #include "switch.h"
+//#include <pic.h>
+#include <stdio.h>
 
 #define LEDRUN LATGbits.LATG12  
 #define LEDSTOP LATGbits.LATG14
@@ -63,126 +65,128 @@ int main(void)
     initLCD();
     int j = 0;
     
-    while(1)
-    {
-        switch(state){                          //LED 1 is on
-              case  ledrun:
-                  reset = 0;
-                  if(PrevState==2)
-                  {
-                      switchFlag = 0;
-                    LEDRUN=ON;
-                    LEDSTOP=OFF;
-                    T3CONbits.TON=1;
-                    PrevState=1;
-                    moveCursorLCD(1,1);
-                    printStringLCD(running);
-                  }
-                    if(switchFlag==1){              //if switch is pressed
-                      switchFlag=0;
-                      state=debouncePress;
-                  }
-                    if(countflag==1){
-                        countflag = 0;
-                        incrimentcount();
-                    }
-                    break;
-               case ledstop:                       //LED 2 is on
-                   if(PrevState==1)
-                   {
-                       switchFlag = 0;
-                   LEDRUN=OFF;
-                    LEDSTOP=ON;
-                    T3CONbits.TON=0;
-                    PrevState=2;
-                    moveCursorLCD(1,1);
-                    printStringLCD(stopped);
-                    j = 0;
-                   }
-                     if(switchFlag==1){              //if switch is pressed
-                            switchFlag=0;
-                            state=debouncePress;
-                        }
-                     if(reset==1){
-                         reset = 0;
-                         state = debounceReset;
-                    }
-                    break;    
-              case debouncePress:               //calls delay and moves to wait state
-                  delayMs(15);
-                  state=wait;
-                  break;
-                  
-            case debounceReset:
-                /* Debounce the press. */
-                delayMs(15);
-                
-                /* Reset timer 3 to 0. It is already turned off in ledstop. */
-                TMR3=0;
-                reset=0;
-                
-                /* Resets volatile variables for the counting function. */
-                hundred=0;
-                ten=0;
-                onesec=0;
-                tensec=0;
-                onemin=0;
-                tenmin=0;
-                
-                /* Set the time on the display back to zero. */
-                moveCursorLCD(1,2);
-                getTimeString();
-                printStringLCD(timeString);
-                
-                /* Wait until the switch is released. */
-                while (reset != 1) {  }
-        
-                /* Turn reset back to zero for future logic. */
-                reset = 0;
-                
-                /* Debounce the release. */
-                delayMs(15);
-                
-                /* Go back to ledstop. */
-                state = ledstop;
-                break;
+    testgetTimeString();
     
-              case debounceRelease:             //calls delay and moves to wait 2 aka logic state
-                  delayMs(15);
-                  state=wait2;
-                  break;
-   
-                case wait:                      //waits until switch is released
-                   
-                    while ( switchFlag != 1 );
-                    
-                    switchFlag = 0;
-                    state = debounceRelease;
-                        
-                        
-                   
-//                    if(switchFlag==1)
-//                    {
-//                        switchFlag=0;
-//                        state=debounceRelease;
+    while(1){};
+//    {
+//        switch(state){                          //LED 1 is on
+//              case  ledrun:
+//                  reset = 0;
+//                  if(PrevState==2)
+//                  {
+//                      switchFlag = 0;
+//                    LEDRUN=ON;
+//                    LEDSTOP=OFF;
+//                    T3CONbits.TON=1;
+//                    PrevState=1;
+//                    moveCursorLCD(1,1);
+//                    printStringLCD(running);
+//                  }
+//                    if(switchFlag==1){              //if switch is pressed
+//                      switchFlag=0;
+//                      state=debouncePress;
+//                  }
+//                    if(countflag==1){
+//                        countflag = 0;
+//                        incrimentcount();
 //                    }
-                    break;
-                case wait2:                     //uses flag that is triggered if switch is held for longer than
-                   if(PrevState==1)
-                   {
-                       state=ledstop;
-                   }
-                   else if(PrevState==2)
-                   {
-                       state=ledrun;
-                   }
-                   break;
-                
-                
-                }
-    }
-    
-    return 0;
+//                    break;
+//               case ledstop:                       //LED 2 is on
+//                   if(PrevState==1)
+//                   {
+//                       switchFlag = 0;
+//                   LEDRUN=OFF;
+//                    LEDSTOP=ON;
+//                    T3CONbits.TON=0;
+//                    PrevState=2;
+//                    moveCursorLCD(1,1);
+//                    printStringLCD(stopped);
+//                    j = 0;
+//                   }
+//                     if(switchFlag==1){              //if switch is pressed
+//                            switchFlag=0;
+//                            state=debouncePress;
+//                        }
+//                     if(reset==1){
+//                         reset = 0;
+//                         state = debounceReset;
+//                    }
+//                    break;    
+//              case debouncePress:               //calls delay and moves to wait state
+//                  delayMs(15);
+//                  state=wait;
+//                  break;
+//                  
+//            case debounceReset:
+//                /* Debounce the press. */
+//                delayMs(15);
+//                
+//                /* Reset timer 3 to 0. It is already turned off in ledstop. */
+//                TMR3=0;
+//                reset=0;
+//                
+//                /* Resets volatile variables for the counting function. */
+//                hundred=0;
+//                ten=0;
+//                onesec=0;
+//                tensec=0;
+//                onemin=0;
+//                tenmin=0;
+//                
+//                /* Set the time on the display back to zero. */
+//                moveCursorLCD(1,2);
+//                getTimeString();
+//                printStringLCD(timeString);
+//                
+//                /* Wait until the switch is released. */
+//                while (reset != 1) {  }
+//        
+//                /* Turn reset back to zero for future logic. */
+//                reset = 0;
+//                
+//                /* Debounce the release. */
+//                delayMs(15);
+//                
+//                /* Go back to ledstop. */
+//                state = ledstop;
+//                break;
+//    
+//              case debounceRelease:             //calls delay and moves to wait 2 aka logic state
+//                  delayMs(15);
+//                  state=wait2;
+//                  break;
+//   
+//                case wait:                      //waits until switch is released
+//                   
+//                    while ( switchFlag != 1 );
+//                    
+//                    switchFlag = 0;
+//                    state = debounceRelease;
+//                        
+//                        
+//                   
+////                    if(switchFlag==1)
+////                    {
+////                        switchFlag=0;
+////                        state=debounceRelease;
+////                    }
+//                    break;
+//                case wait2:                     //uses flag that is triggered if switch is held for longer than
+//                   if(PrevState==1)
+//                   {
+//                       state=ledstop;
+//                   }
+//                   else if(PrevState==2)
+//                   {
+//                       state=ledrun;
+//                   }
+//                   break;
+//                
+//                
+//                }
+//    }
+//    
+//    return 0;
 }
 
 void __ISR(_CHANGE_NOTICE_VECTOR, IPL7SRS) _CNInterrupt(void){
@@ -276,9 +280,11 @@ void getTimeString(){
     
 }
 
+
 void testgetTimeString(){
 // testing MM:SS:FF 
 // expect string to be at least dd:dd:dd
+    
     
     tenmin = 7;
     onemin = 2;
@@ -294,15 +300,19 @@ void testgetTimeString(){
     int noError = 0;
     while(testing[i] != '\0'){
         if(testing[i] != timeString[i]){
-            //ERROR (printing to stdout????) fix???
-            printf("ERROR: timeString incorrect\n");
-            printf("Expected: %s\n Actual: %s", testing, timeString);
+//            //ERROR (printing to stdout????) fix???
+//            printf("ERROR: timeString incorrect\n");
+//            printf("Expected: %s\n Actual: %s", testing, timeString);
             noError = 1;
+            // no stdout on this thing... SOO using LEDs
+            LATDbits.LATD0 = 1; // red LED illuminates 
             break;
         }
         i++;
     }
     if(noError == 0){
-        printf("No errors, getTimeString functions");
+       // printf("No errors, getTimeString functions");
+        LATDbits.LATD2 = 1; // green LED illuminates 
     }
-
+    
+}

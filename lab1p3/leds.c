@@ -29,4 +29,14 @@ void initLEDs(){
     LEDRUN=ON;
     LEDSTOP=ON;
     
+    // edit for testing - WHere are these???
+    
+    TRISDbits.TRISD0 = OUTPUT;
+    TRISDbits.TRISD2 = OUTPUT;
+    
+    LATDbits.LATD0 = 0;
+    LATDbits.LATD2 = 0;
+    
+    
+    
 }

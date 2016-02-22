@@ -12,7 +12,7 @@
 #include "config.h"
 #include "timer.h"
 #include "interrupt.h"
-#include "lcd.h"
+//#include "lcd.h"
 
 
 // ******************************************************************************************* //
@@ -26,36 +26,40 @@ int main(void)
     enableInterrupts();
     initTimer1();
     initTimer2();
-    initLCD();
+    //initLCD();
     
     
     while(1)
     {
     //testLCD();
-    printStringLCD("Purple");
-    for(i = 0; i < 1000; i++) delayUs(1000);
+        delayUs(50);
+        LATDbits.LATD0 = 1;
+        delayUs(50);
+        LATDbits.LATD0 = 0;
+//    printStringLCD("Purple");
+//    for(i = 0; i < 1000; i++) delayUs(1000);
 
     }
     
     return 0;
 }
 
-//void testDelayUs(){
-//    
-//    while(1){
-//        delayUs(50);
-//        LATDbits.LATD0 = 1;
-//        delayUs(50);
-//        LATDbits.LATD0 = 0;
-//    }
-//}
-////
-void testWriteLCD(){
-
+void testDelayUs(){
+    
     while(1){
-        delayUs(500);
-        writeLCD('p',1,100);
-        delayUs(500);
-        clearLCD();
+        delayUs(50);
+        LATDbits.LATD0 = 1;
+        delayUs(50);
+        LATDbits.LATD0 = 0;
     }
 }
+//
+//void testWriteLCD(){
+//
+//    while(1){
+//        delayUs(500);
+//        writeLCD('p',1,100);
+//        delayUs(500);
+//        clearLCD();
+//    }
+//}
