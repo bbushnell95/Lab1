@@ -12,7 +12,7 @@
 #include "config.h"
 #include "timer.h"
 #include "interrupt.h"
-//#include "lcd.h"
+#include "lcd.h"
 
 
 // ******************************************************************************************* //
@@ -23,22 +23,23 @@ int main(void)
     enableInterrupts();
     initTimer1();
     initTimer2();
-    //initLCD();
+    initLCD();
     
     
     while(1)
     {
-   testLCD();                              //calls test function
+	testLCD();                              //calls test function
    }
     
     return 0;
 }
+
 void testDelayUs(){
     
     while(1){
-        delayUs(50);
+        delayMs(50); // testing delayMs() instead of delayUs() since delayMs() is the delay used in project
         LATDbits.LATD0 = 1;
-        delayUs(50);
+        delayMs(50);
         LATDbits.LATD0 = 0;
     }
 }
@@ -46,9 +47,9 @@ void testDelayUs(){
 void testWriteLCD(){
 
     while(1){
-        delayUs(500);
+        delayMs(1);
         writeLCD('p',1,100);
-        delayUs(500);
+        delayMs(1);
         clearLCD();
     }
 }
