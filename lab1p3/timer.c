@@ -21,7 +21,8 @@ void initTimer1(){
 void delayMs(unsigned int delay){
     TMR1=0;
     T1CONbits.TCKPS=3;      //prescaler of 256
-    PR1=(((delay*10000)/256)-1);
+    //PR1=(((delay*10000)/256)-1); // Old value with incredible error leads to 10ms when 1ms wanted.
+    PR1=(((delay*10000)/(1.3*256))-1); // Calculated to get exact values.
     T1CONbits.ON=1;
     IFS0bits.T1IF=0;
     while(IFS0bits.T1IF==0)
